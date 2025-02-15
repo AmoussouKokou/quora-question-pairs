@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 import download_data as dld
+from sklearn.model_selection import train_test_split
 # import re
 # import string
 # import joblib
@@ -20,11 +21,12 @@ import download_data as dld
 # nltk.download("punkt")
 
 class Mlearn:
-    def __init__(self, train_path="quora_data/train.csv"):
+    def __init__(self, train_path="quora_data/train.csv", ):
         """Initialisation de la classe avec le chemin du fichier d'entraînement."""
         self.train_path = train_path
         # self.vectorizer = TfidfVectorizer(max_features=5000, stop_words='english')
-        # self.model = RandomForestClassifier(n_estimators=100, random_state=42)
+        self.model = None # RandomForestClassifier(n_estimators=100, random_state=42)
+        self.data = None
 
     def load_data(self):
         """Charge et nettoie les données."""
@@ -50,7 +52,30 @@ class Mlearn:
         train_data = train_data.dropna()  # Suppression des valeurs manquantes
         train_data = train_data.sample(frac=1).reset_index(drop=True)  # Mélange des données
 
-        return train_data
+        self.data = train_data
+    
+    def split_data(self):
+
+        print("🔹 Découpage des données...")
+
+        X = self.data[['question1', 'question2']]
+        y = self.data['is_duplicate']
+
+        # Découper en Train (70%), Validation (15%), Test (15%)
+        X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
+        X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42, stratify=y_temp)
+
+        self.X_train = X_train
+        self.X_test = X_test
+        self.X_val = X_val
+        self.y_train = y_train
+        self.y_test = y_test
+        self.y_val = y_val
+
+
+    # def rndforest(self):
+    #     """Entraînement du modèle RandomForestClassifier."""
+    #     print("�� Entraînement du modèle RandomForestClassifier...")
 
     # def clean_text(self, text):
     #     """Nettoyage du texte (suppression des caractères spéciaux, mise en minuscules, etc.)."""
@@ -60,28 +85,28 @@ class Mlearn:
     #     words = [word for word in words if word not in stopwords.words("english")]
     #     return " ".join(words)
 
-    # def extract_features(self, df):
-    #     """Extraction de caractéristiques pour le machine learning."""
-    #     print("🔹 Extraction des caractéristiques...")
+    def extract_features(self, X):
+        """Extraction de caractéristiques pour le machine learning."""
+        print("🔹 Extraction des caractéristiques...")
 
-    #     # Nettoyage des questions
-    #     df["clean_q1"] = df["question1"].astype(str).apply(self.clean_text)
-    #     df["clean_q2"] = df["question2"].astype(str).apply(self.clean_text)
+        # Nettoyage des questions
+        df["clean_q1"] = df["question1"].astype(str).apply(self.clean_text)
+        df["clean_q2"] = df["question2"].astype(str).apply(self.clean_text)
 
-    #     # Vectorisation TF-IDF
-    #     questions = pd.concat([df["clean_q1"], df["clean_q2"]], axis=0).values
-    #     self.vectorizer.fit(questions)
+        # Vectorisation TF-IDF
+        questions = pd.concat([df["clean_q1"], df["clean_q2"]], axis=0).values
+        self.vectorizer.fit(questions)
 
-    #     q1_tfidf = self.vectorizer.transform(df["clean_q1"]).toarray()
-    #     q2_tfidf = self.vectorizer.transform(df["clean_q2"]).toarray()
+        q1_tfidf = self.vectorizer.transform(df["clean_q1"]).toarray()
+        q2_tfidf = self.vectorizer.transform(df["clean_q2"]).toarray()
 
-    #     # Calcul de la similarité cosinus entre TF-IDF des deux questions
-    #     df["cosine_similarity"] = [1 - cosine(q1_tfidf[i], q2_tfidf[i]) for i in range(len(df))]
+        # Calcul de la similarité cosinus entre TF-IDF des deux questions
+        df["cosine_similarity"] = [1 - cosine(q1_tfidf[i], q2_tfidf[i]) for i in range(len(df))]
 
-    #     # Différence de longueur
-    #     df["length_diff"] = df["question1"].astype(str).apply(len) - df["question2"].astype(str).apply(len)
+        # Différence de longueur
+        df["length_diff"] = df["question1"].astype(str).apply(len) - df["question2"].astype(str).apply(len)
 
-    #     return df[["cosine_similarity", "length_diff"]], df["is_duplicate"]
+        return df[["cosine_similarity", "length_diff"]], df["is_duplicate"]
 
     # def train_model(self, X, y):
     #     """Entraîne le modèle de classification."""
@@ -123,7 +148,11 @@ class Mlearn:
 if __name__ == "__main__":
     detector = Mlearn()
 
-    print(detector.load_data())
+    detector.load_data()
+
+    detector.split_data()
+
+    print(detector.X_train)
     
     # Étape 1: Chargement et préparation des données
     # data = detector.load_data()
