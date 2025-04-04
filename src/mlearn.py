@@ -3,22 +3,23 @@ import numpy as np
 import os
 import download_data as dld
 from sklearn.model_selection import train_test_split
-# import re
-# import string
+import re
+import string
 # import joblib
 # from sklearn.feature_extraction.text import TfidfVectorizer
 # from sklearn.model_selection import train_test_split
 # from sklearn.ensemble import RandomForestClassifier
 # from sklearn.metrics import accuracy_score, f1_score
 # from scipy.spatial.distance import cosine
-# from nltk.corpus import stopwords
-# from nltk.tokenize import word_tokenize
-# import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+import nltk
 
 
 # # Télécharger les stopwords si nécessaire
-# nltk.download("stopwords")
-# nltk.download("punkt")
+nltk.download("stopwords")
+nltk.download("punkt")
+nltk.download('punkt_tab')
 
 class Mlearn:
     def __init__(self, train_path="quora_data/train.csv", ):
@@ -77,13 +78,13 @@ class Mlearn:
     #     """Entraînement du modèle RandomForestClassifier."""
     #     print("�� Entraînement du modèle RandomForestClassifier...")
 
-    # def clean_text(self, text):
-    #     """Nettoyage du texte (suppression des caractères spéciaux, mise en minuscules, etc.)."""
-    #     text = text.lower()
-    #     text = re.sub(f"[{string.punctuation}]", "", text)  # Suppression de la ponctuation
-    #     words = word_tokenize(text)
-    #     words = [word for word in words if word not in stopwords.words("english")]
-    #     return " ".join(words)
+    def clean_text(self, text):
+        """Nettoyage du texte (suppression des caractères spéciaux, mise en minuscules, etc.)."""
+        text = text.lower()
+        text = re.sub(f"[{string.punctuation}]", "", text)  # Suppression de la ponctuation
+        words = word_tokenize(text)
+        words = [word for word in words if word not in stopwords.words("english")]
+        return " ".join(words)
 
     def extract_features(self, X):
         """Extraction de caractéristiques pour le machine learning."""
@@ -148,11 +149,11 @@ class Mlearn:
 if __name__ == "__main__":
     detector = Mlearn()
 
-    detector.load_data()
+    # detector.load_data()
 
-    detector.split_data()
+    # detector.split_data()
 
-    print(detector.X_train)
+    print(detector.clean_text("Do employees at B&G Foods have a good work-lif.."))
     
     # Étape 1: Chargement et préparation des données
     # data = detector.load_data()
