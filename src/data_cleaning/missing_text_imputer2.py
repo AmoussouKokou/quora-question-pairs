@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
 class MissingTextImputer(BaseEstimator, TransformerMixin):
-    def __init__(self, dissimilar_word="abababa", n_repeat=5):
+    def __init__(self, dissimilar_word=" ", n_repeat=1):
         self.dissimilar_word = dissimilar_word
         self.n_repeat = n_repeat
 

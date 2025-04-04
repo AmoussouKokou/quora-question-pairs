@@ -111,7 +111,7 @@ class TextSimilarityFeatures(BaseEstimator, TransformerMixin):
             }))
         
         # Retourne le DataFrame final contenant toutes les caractéristiques
-        return pd.concat(features_list, ignore_index=True)
+        return pd.concat(features_list, ignore_index=False)
 
 if __name__ == "__main__":
     # Données d'exemple pour tester la classe
